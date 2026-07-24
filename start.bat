@@ -1,5 +1,4 @@
 @echo off
-chcp 65001 > nul
 title OSA Calculator
 
 echo ================================
@@ -7,52 +6,58 @@ echo        OSA Calculator
 echo ================================
 echo.
 
-REM Проверяем наличие venv
+
 if not exist "venv\Scripts\activate.bat" (
-    echo [INFO] Создаю виртуальное окружение...
+    echo [INFO] Creating virtual environment...
+
     python -m venv venv
 
     if errorlevel 1 (
-        echo [ERROR] Не удалось создать venv
+        echo [ERROR] Failed to create venv
         pause
         exit /b
     )
 )
 
-echo [INFO] Активирую окружение...
+
+echo [INFO] Activating environment...
+
 call venv\Scripts\activate.bat
 
 
-REM Устанавливаем зависимости
 if exist "requirements.txt" (
-    echo [INFO] Проверяю зависимости...
+
+    echo [INFO] Installing dependencies...
+
+    python -m pip install --upgrade pip
     pip install -r requirements.txt
 
     if errorlevel 1 (
-        echo.
-        echo [ERROR] Ошибка установки зависимостей
+        echo [ERROR] Failed to install dependencies
         pause
         exit /b
     )
+
 ) else (
-    echo [WARNING] requirements.txt не найден
+
+    echo [WARNING] requirements.txt not found
+
 )
 
 
 echo.
 echo ================================
-echo       Запуск расчёта...
+echo       Starting calculator
 echo ================================
 echo.
 
 
-REM Запуск программы
 python main.py
 
 
 echo.
 echo ================================
-echo       Работа завершена
+echo       Finished
 echo ================================
 echo.
 
