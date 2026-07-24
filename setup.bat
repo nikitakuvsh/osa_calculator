@@ -14,34 +14,33 @@ set REPO=https://github.com/nikitakuvsh/osa_calculator/archive/refs/heads/main.z
 set ZIP=osa_calculator.zip
 
 
-echo [INFO] Скачиваю проект...
+echo [INFO] Downloading...
 
 powershell -Command "Invoke-WebRequest -Uri '%REPO%' -OutFile '%ZIP%'"
 
 
 if errorlevel 1 (
     echo.
-    echo [ERROR] Не удалось скачать проект
+    echo [ERROR] Can't downloading
     pause
     exit /b
 )
 
 
-echo [INFO] Распаковываю...
-
+echo [INFO] Rearchive...
 
 powershell -Command "Expand-Archive -Path '%ZIP%' -DestinationPath '.' -Force"
 
 
 if errorlevel 1 (
     echo.
-    echo [ERROR] Ошибка распаковки
+    echo [ERROR] Error rearchive...
     pause
     exit /b
 )
 
 
-echo [INFO] Перемещаю файлы...
+echo [INFO] Forwards files...
 
 
 xcopy "osa_calculator-main\*" "." /E /H /Y > nul
@@ -49,13 +48,13 @@ xcopy "osa_calculator-main\*" "." /E /H /Y > nul
 
 if errorlevel 1 (
     echo.
-    echo [ERROR] Ошибка копирования файлов
+    echo [ERROR] Error copy files
     pause
     exit /b
 )
 
 
-echo [INFO] Удаляю временные файлы...
+echo [INFO] Delete template files..
 
 
 del "%ZIP%"
@@ -64,7 +63,7 @@ rmdir /s /q "osa_calculator-main"
 
 echo.
 echo ================================
-echo       Установка завершена!
+echo       Installation succes!
 echo ================================
 echo.
 
