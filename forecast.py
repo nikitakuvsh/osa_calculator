@@ -2,7 +2,6 @@ import random
 
 random.seed(42)
 
-
 def forecast_next_year(values):
 
     result = []
@@ -25,66 +24,87 @@ def forecast_next_year(values):
 
     return result
 
-def forecast_next_year_osa(values):
 
-    if not values:
-        return []
-
-
-    # убираем None
-    clean = [
-        v for v in values
-        if v is not None
-    ]
-
-
-    if len(clean) < 3:
-        return values
-
-
-    # базовый уровень - среднее последних 4 периодов
-    base = sum(clean[-4:]) / 4
-
+def forecast_next_year(values):
+    """
+    Прогноз Merch Impact.
+    Небольшой рост относительно прошлого года.
+    """
 
     result = []
 
+    for value in values:
 
-    # небольшие колебания
-    changes = [
-        -0.008,
-        -0.005,
-        -0.01,
-        -0.006,
-        0.002,
-        -0.003,
-        0.004,
-        0.005,
-        -0.002,
-        0,
-        0,
-        0,
-        0
-    ]
+        if value is None:
+            result.append(None)
+            continue
 
+        growth = random.uniform(0.002, 0.008)
+        noise = random.uniform(-0.001, 0.001)
 
-    for i in range(13):
+        new_value = value + growth + noise
 
-        value = base + changes[i]
+        new_value = max(0, min(new_value, 1))
+
+        result.append(round(new_value, 4))
+
+    return result
 
 
-        # ограничение от 0 до 100%
-        value = max(
-            0,
-            min(
-                value,
-                1
-            )
-        )
+def forecast_next_year_osa(values):
+    """
+    Прогноз OSA.
+    Держится рядом с прошлогодними значениями,
+    слегка повторяя форму исходного ряда.
+    """
 
+    result = []
 
-        result.append(
-            round(value, 4)
-        )
+    previous = None
 
+    for i, value in enumerate(values):
+
+        if value is None:
+            result.append(None)
+            continue
+
+        # первое значение
+        if previous is None:
+
+            new_value = value + random.uniform(-0.003, 0.004)
+
+        else:
+
+            # повторяем изменение прошлого года
+            old_delta = value - values[i - 1]
+
+            # сохраняем примерно тот же характер изменения
+            trend = old_delta * random.uniform(0.6, 1.2)
+
+            # чаще чуть растём
+            bias = random.uniform(0.0003, 0.0015)
+
+            # небольшой случайный шум
+            noise = random.uniform(-0.001, 0.001)
+
+            new_value = previous + trend + bias + noise
+
+            # максимум изменение за период ±0.7%
+            max_step = 0.007
+
+            if new_value > previous + max_step:
+                new_value = previous + max_step
+
+            if new_value < previous - max_step:
+                new_value = previous - max_step
+
+        # потолок 98%
+        new_value = min(new_value, 0.98)
+
+        # минимум 0
+        new_value = max(new_value, 0)
+
+        result.append(round(new_value, 4))
+        previous = new_value
 
     return result

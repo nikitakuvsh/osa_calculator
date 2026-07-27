@@ -4,8 +4,9 @@ import pandas as pd
 
 
 def merge_data(workbook, source_file):
+    header_row = int(input('С какой строки начинаются заголовки файла? Введите число, например, 2 >>> ')) - 1
 
-    df = pd.read_excel(source_file, header=2)
+    df = pd.read_excel(source_file, header=header_row)
     print(df.columns.tolist())
 
     # открываем исходный файл
