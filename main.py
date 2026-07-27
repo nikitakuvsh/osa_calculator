@@ -84,7 +84,7 @@ def main():
         print(CYAN + "[+] Объединяю данные..." + RESET)
 
 
-        export_df = merge_data(
+        export_df, dmr_dict = merge_data(
             workbook=wb,
             source_file=source_file
         )
@@ -95,7 +95,8 @@ def main():
 
         create_table(
             wb,
-            export_df
+            export_df,
+            dmr_dict
         )
 
 

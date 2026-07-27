@@ -16,7 +16,7 @@ logs = {
 }
 
 
-def create_table(wb, df):
+def create_table(wb, df, dmr_dict):
 
     if "Report" not in wb.sheetnames:
         ws = wb.create_sheet("Report")
@@ -179,6 +179,7 @@ def create_table(wb, df):
 
 
     for retailer in retailers:
+        dmr_values = dmr_dict.get(retailer, {})
 
 
         # ------------------------------
@@ -412,6 +413,15 @@ def create_table(wb, df):
         for period_index, period in enumerate(periods):
 
             col = START_COL + 2 + period_index
+            period_name = f"p{period_index + 1}"
+            dmr = dmr_values.get(period_name)
+            if dmr is not None:
+                ws.cell(
+                    row=current_row + 1,
+                    column=col,
+                    value=dmr
+                ).number_format = '# ##0'
+                
 
 
             row_osa = current_row + 7
@@ -462,6 +472,14 @@ def create_table(wb, df):
                     ).number_format = "0.00%"
 
                 else: merch_values.append(None)
+
+            values = [v for v in dmr_values.values() if isinstance(v, (int, float))]
+            if values:
+                ws.cell(
+                    row=current_row + 1,
+                    column=START_COL + 115,
+                    value=sum(values)
+                ).number_format = "# ##0"
 
         if not logs["forecast"]:
             print('Занимаюсь творческим выдумыванием процентов на следующий год :)')
@@ -595,6 +613,32 @@ def create_table(wb, df):
                     )
                 ).number_format = "0.00%"
 
+        # ==================================================
+        # ЭФ-т, млн руб Merch in
+        # ==================================================
+
+        for i in range(13):
+
+            col = START_COL + 2 + i
+
+            dmr = ws.cell(
+                row=current_row + 1,
+                column=col
+            ).value
+
+            lsv = ws.cell(
+                row=current_row + 6,
+                column=col
+            ).value
+
+            if dmr is not None and lsv is not None:
+
+                ws.cell(
+                    row=current_row + 7,
+                    column=col,
+                    value=round(dmr * lsv, 2)
+                ).number_format = '# ##0.00'
+
 
 
         # ==================================================
@@ -627,6 +671,32 @@ def create_table(wb, df):
                         4
                     )
                 ).number_format = "0.00%"
+
+        # ==================================================
+        # ЭФ-т, млн руб Osa Base
+        # ==================================================
+
+        for i in range(13):
+
+            col = START_COL + 2 + i
+
+            dmr = ws.cell(
+                row=current_row + 1,
+                column=col
+            ).value
+
+            lsv = ws.cell(
+                row=current_row + 11,
+                column=col
+            ).value
+
+            if dmr is not None and lsv is not None:
+
+                ws.cell(
+                    row=current_row + 12,
+                    column=col,
+                    value=round(dmr * lsv, 2)
+                ).number_format = '# ##0.00'
 
         # ==================================================
         # TOTAL OSA
@@ -1075,6 +1145,127 @@ def create_table(wb, df):
                     4
                 )
             ).number_format = "0.00%"
+
+        # ==================================================
+        # total 2027 млн руб
+        # ==================================================
+
+        for i in range(13):
+
+            col = START_COL + 2 + i
+
+            merch_effect = ws.cell(
+                row=current_row + 7,
+                column=col
+            ).value
+
+            osa_effect = ws.cell(
+                row=current_row + 12,
+                column=col
+            ).value
+
+            if merch_effect is not None and osa_effect is not None:
+
+                ws.cell(
+                    row=current_row + 16,
+                    column=col,
+                    value=round(
+                        merch_effect + osa_effect,
+                        2
+                    )
+                ).number_format = "# ##0.00"
+
+        # Эф-т, млн руб Merch in (total)
+
+        # ==================================================
+        # TOTAL ЭФ-Т млн руб Merch in
+        # сумма всех периодов
+        # ==================================================
+
+        merch_effect_total = []
+
+        for i in range(13):
+
+            value = ws.cell(
+                row=current_row + 7,
+                column=START_COL + 2 + i
+            ).value
+
+            if value is not None:
+                merch_effect_total.append(value)
+
+
+        if merch_effect_total:
+
+            ws.cell(
+                row=current_row + 7,
+                column=total_col,
+                value=round(
+                    sum(merch_effect_total),
+                    2
+                )
+            ).number_format = "# ##0.00"
+
+
+
+        # ==================================================
+        # TOTAL ЭФ-Т млн руб Osa Base
+        # сумма всех периодов
+        # ==================================================
+
+        osa_effect_total = []
+
+        for i in range(13):
+
+            value = ws.cell(
+                row=current_row + 12,
+                column=START_COL + 2 + i
+            ).value
+
+            if value is not None:
+                osa_effect_total.append(value)
+
+
+        if osa_effect_total:
+
+            ws.cell(
+                row=current_row + 12,
+                column=total_col,
+                value=round(
+                    sum(osa_effect_total),
+                    2
+                )
+            ).number_format = "# ##0.00"
+
+
+
+        # ==================================================
+        # TOTAL current_year + 1 млн руб
+        # Merch + OSA
+        # ==================================================
+
+        merch_total = ws.cell(
+            row=current_row + 7,
+            column=total_col
+        ).value
+
+
+        osa_total = ws.cell(
+            row=current_row + 12,
+            column=total_col
+        ).value
+
+
+        if merch_total is not None and osa_total is not None:
+
+            ws.cell(
+                row=current_row + 16,
+                column=total_col,
+                value=round(
+                    merch_total + osa_total,
+                    2
+                )
+            ).number_format = "# ##0.00"
 
 # ==================================================
 # Бордеры блока
