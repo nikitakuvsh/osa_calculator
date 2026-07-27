@@ -54,7 +54,7 @@ def main():
     banner()
 
     print(CYAN + "[+] Инициализация калькулятора..." + RESET)
-    print('Необходимо выбрать файл с выгрузкой из PowerBI')
+    print('    Необходимо выбрать файл с выгрузкой из PowerBI')
 
 
     source_file = select_excel()

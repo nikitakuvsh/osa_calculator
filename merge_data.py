@@ -76,7 +76,7 @@ def merge_data(workbook, source_file):
         header=find_export_header(source_file)
     )
 
-    print(f"Найдены заголовки Export{export_df.columns.tolist()}")
+    print("    Найдены заголовки Export")
 
     # -----------------------------
     # DMR
@@ -96,7 +96,7 @@ def merge_data(workbook, source_file):
         .str.strip()
     )
 
-    print(f"Найдены заголовки DMR\n{dmr_df.columns.tolist()}")
+    print(f"    Найдены заголовки DMR")
 
     # -----------------------------
     # Копируем первый лист в Export
@@ -150,8 +150,8 @@ def merge_data(workbook, source_file):
         ws.row_dimensions[row].height = dim.height
 
     print(
-        f"Export заполнен: {source_ws.max_row} строк, "
-        f"{source_ws.max_column} колонок"
+        f"    Export заполнен: {source_ws.max_row} строк, "
+        f"    {source_ws.max_column} колонок"
     )
 
     dmr_dict = {}
@@ -165,7 +165,7 @@ def merge_data(workbook, source_file):
                 dmr_dict[retailer][period] = float(value)
 
     print(
-        f"DMR найден. Строк: {len(dmr_df)}"
+        f"    DMR найден. Строк: {len(dmr_df)}"
     )
 
     return export_df, dmr_dict

@@ -50,6 +50,11 @@ def create_table(wb, df, dmr_dict):
 
     retailers = df["retailer_name"].drop_duplicates().tolist()
 
+    # Фильр только с DMR
+    retailers = [retailer for retailer in retailers if retailer in dmr_dict and any(isinstance(v, (int, float)) for v in dmr_dict[retailer].values())]
+    if not retailers: return wb
+    print(f'    Количество retailers после фильтра по DMR = {len(retailers)}')
+
 
     if not retailers:
         return wb
@@ -84,7 +89,7 @@ def create_table(wb, df, dmr_dict):
 
     ws.column_dimensions[
         get_column_letter(START_COL)
-    ].width = 18
+    ].width = 28
 
 
     ws.column_dimensions[
@@ -95,12 +100,12 @@ def create_table(wb, df, dmr_dict):
     for i in range(13):
         ws.column_dimensions[
             get_column_letter(START_COL + 2 + i)
-        ].width = 10
+        ].width = 12
 
 
     ws.column_dimensions[
         get_column_letter(START_COL + 15)
-    ].width = 12
+    ].width = 14
 
 
 
@@ -181,6 +186,7 @@ def create_table(wb, df, dmr_dict):
 
     for retailer in retailers:
         dmr_values = dmr_dict.get(retailer, {})
+        if not dmr_values: continue
 
 
         # ------------------------------
@@ -255,6 +261,7 @@ def create_table(wb, df, dmr_dict):
 
         cell.font = bold
         cell.alignment = center
+        cell.fill = green
 
 
 
@@ -337,6 +344,8 @@ def create_table(wb, df, dmr_dict):
             if i in [0, 12, 13]:
                 cell.font = bold
 
+            if i in [17]: cell.fill = white
+
 
             cell.alignment = center
 
@@ -348,9 +357,9 @@ def create_table(wb, df, dmr_dict):
         # ==================================================
 
         full_rows = [
-            7,   # ЭФ-т, млн руб Merch in
+            6,   # ЭФ-т, млн руб Merch in
             11,  # ЭФ-т, млн руб Osa Base
-            16   # total 2027 млн руб
+            15   # total 2027 млн руб
         ]
 
 
@@ -407,7 +416,7 @@ def create_table(wb, df, dmr_dict):
         osa_values = []
 
         if not logs["merge"]:
-            print('Мержу данные со вкладкой Export')
+            print('    Мержу данные со вкладкой Export')
             logs["merge"] = True
             sleep(0.5)        
 
@@ -478,7 +487,7 @@ def create_table(wb, df, dmr_dict):
             if values:
                 ws.cell(
                     row=current_row + 1,
-                    column=START_COL + 115,
+                    column=START_COL + 15,
                     value=sum(values)
                 ).number_format = "# ##0"
 
@@ -531,7 +540,7 @@ def create_table(wb, df, dmr_dict):
                 ).number_format = "# ##0"
 
         if not logs["forecast"]:
-            print('Занимаюсь творческим выдумыванием процентов на следующий год :)')
+            print('    Занимаюсь творческим выдумыванием процентов на следующий год :)')
             logs["forecast"] = True
             sleep(0.5)
 
@@ -599,7 +608,7 @@ def create_table(wb, df, dmr_dict):
         # ==================================================
 
         if not logs["dif_merch"]:
-            print('Считаю разницу dif Merch Impact')
+            print('    Считаю разницу dif Merch Impact')
             logs["dif_merch"] = True
             sleep(0.7)
 
@@ -637,7 +646,7 @@ def create_table(wb, df, dmr_dict):
         # ==================================================
 
         if not logs["dif_osa"]:
-            print('Считаю разницу dif OSA')
+            print('    Считаю разницу dif OSA')
             logs["dif_osa"] = True
             sleep(0.3)
 
@@ -673,7 +682,7 @@ def create_table(wb, df, dmr_dict):
         # ==================================================
 
         if not logs["lsv_merch"]:
-            print('Рассчитываю Эф-т LSV Merch Impact')
+            print('    Рассчитываю Эф-т LSV Merch Impact')
             logs["lsv_merch"] = True
             sleep(1)
 
@@ -732,7 +741,7 @@ def create_table(wb, df, dmr_dict):
 
         
         if not logs["lsv_osa"]:
-            print('Рассчитываю Эф-т LSV OSA')
+            print('    Рассчитываю Эф-т LSV OSA')
             logs["lsv_osa"] = True
             sleep(0.4)
 
@@ -788,7 +797,7 @@ def create_table(wb, df, dmr_dict):
         # ==================================================
                 
         if not logs["total_osa"]:
-            print('Считаю Total OSA')
+            print('    Считаю Total OSA')
             logs["total_osa"] = True
             sleep(1)
 
@@ -1396,6 +1405,6 @@ def create_table(wb, df, dmr_dict):
         current_row += 19
 
 
-    print('Ввожу последние штрихи')
+    print('    Ввожу последние штрихи')
     sleep(1)
     return wb
