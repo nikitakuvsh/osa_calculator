@@ -2,7 +2,12 @@ from openpyxl.styles import PatternFill, Border, Side, Alignment, Font
 from openpyxl.utils import get_column_letter
 import re
 import pandas as pd
-from forecast import forecast_next_year, forecast_next_year_osa
+from forecast import (
+    forecast_missing_periods,
+    forecast_missing_periods_osa,
+    forecast_next_year,
+    forecast_next_year_osa
+)
 from time import sleep
 
 logs = {
@@ -49,22 +54,18 @@ def create_table(wb, df, dmr_dict):
     if not retailers:
         return wb
 
-
-    periods = sorted(
-        df["full_period_name"]
-        .dropna()
-        .unique()
-        .tolist()
-    )
+    raw_periods = sorted(df["full_period_name"].dropna().unique().tolist())
 
 
     # год из файла
     match = re.search(
         r"(20\d{2})",
-        str(periods[0])
+        str(raw_periods[0])
     )
 
     current_year = int(match.group(1)) if match else 2026
+
+    periods = [f"{current_year} P{i:02d}" for i in range(1, 14)]
 
 
 
@@ -481,32 +482,116 @@ def create_table(wb, df, dmr_dict):
                     value=sum(values)
                 ).number_format = "# ##0"
 
+        # ==================================================
+        # Заполняем отсутствующие периоды текущего года
+        # ==================================================
+
+        while len(merch_values) < 13: merch_values.append(None)
+        while len(osa_values) < 13: osa_values.append(None)
+
+        merch_2026_full = forecast_missing_periods(merch_values)
+        osa_2026_full = forecast_missing_periods_osa(osa_values)
+
+        for i in range(13):
+            col = START_COL + 2 + i
+
+            cell = ws.cell(
+                row=current_row + 3,
+                column=col
+            )
+
+            if cell.value is None:
+                cell.value = merch_2026_full[i]
+                cell.number_format = "0.00%"
+                cell.font = red_text
+
+
+        for i in range(13):
+            col = START_COL + 2 + i
+
+            cell = ws.cell(
+                row=current_row + 8,
+                column=col
+            )
+
+            if cell.value is None:
+                cell.value = osa_2026_full[i]
+                cell.number_format = "0.00%"
+                cell.font = red_text
+
+        for period_index in range(13):
+            col = START_COL + 2 + period_index
+            period_name = f"p{period_index + 1}"
+            dmr = dmr_values.get(period_name)
+            if dmr is not None:
+                ws.cell(
+                    row=current_row + 1,
+                    column=col,
+                    value=dmr
+                ).number_format = "# ##0"
+
         if not logs["forecast"]:
             print('Занимаюсь творческим выдумыванием процентов на следующий год :)')
             logs["forecast"] = True
             sleep(0.5)
 
-        merch_forecast = forecast_next_year(merch_values)
-        osa_forecast = forecast_next_year_osa(osa_values)
+        # Берём уже заполненный полностью текущий год
+        full_merch_values = []
 
-        for i, value in enumerate(merch_forecast):
+        for i in range(13):
+
+            value = ws.cell(
+                row=current_row + 3,
+                column=START_COL + 2 + i
+            ).value
+
             if value is not None:
-                ws.cell(
-                    row=current_row+4,
+                full_merch_values.append(value)
+
+
+
+        full_osa_values = []
+
+        for i in range(13):
+
+            value = ws.cell(
+                row=current_row + 8,
+                column=START_COL + 2 + i
+            ).value
+
+            if value is not None:
+                full_osa_values.append(value)
+
+
+
+        # прогноз следующего года
+        merch_forecast = forecast_next_year(full_merch_values)
+        osa_forecast = forecast_next_year_osa(full_osa_values)
+
+        for i in range(13):
+            value = merch_forecast[i] if i < len(merch_forecast) else None
+
+            if value is not None:
+                cell = ws.cell(
+                    row=current_row + 4,
                     column=START_COL + 2 + i,
                     value=value
-                ).number_format = "0.00%"
+                )
 
+                cell.number_format = "0.00%"
                 cell.font = red_text
 
-        for i, value in enumerate(osa_forecast):
+        for i in range(13):
+            value = osa_forecast[i] if i < len(osa_forecast) else None
+
             if value is not None:
-                ws.cell(
+                cell = ws.cell(
                     row=current_row + 9,
                     column=START_COL + 2 + i,
                     value=value
-                ).number_format = "0.00%"
+                )
 
+                cell.number_format = "0.00%"
                 cell.font = red_text
 
         # ==================================================

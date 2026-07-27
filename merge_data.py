@@ -76,7 +76,7 @@ def merge_data(workbook, source_file):
         header=find_export_header(source_file)
     )
 
-    print(export_df.columns.tolist())
+    print(f"Найдены заголовки Export{export_df.columns.tolist()}")
 
     # -----------------------------
     # DMR
@@ -95,6 +95,8 @@ def merge_data(workbook, source_file):
         .astype(str)
         .str.strip()
     )
+
+    print(f"Найдены заголовки DMR\n{dmr_df.columns.tolist()}")
 
     # -----------------------------
     # Копируем первый лист в Export
