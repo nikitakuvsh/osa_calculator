@@ -2,6 +2,43 @@ import random
 
 random.seed(42)
 
+def limit_growth(previous_year, predicted):
+    """
+    previous_year - значение прошлого года (0..1)
+    predicted     - то, что посчитал текущий алгоритм
+
+    Возвращает ограниченное значение.
+    """
+
+    # Ниже прошлого года уходить нельзя
+    predicted = max(predicted, previous_year)
+
+    # До потолка осталось
+    distance = 0.98 - previous_year
+
+    if distance <= 0:
+        return round(min(previous_year, 0.98), 4)
+
+    # Максимальный допустимый прирост
+    if previous_year >= 0.95:
+        max_growth = 0.001      # +0.1%
+    elif previous_year >= 0.92:
+        max_growth = 0.002      # +0.2%
+    elif previous_year >= 0.90:
+        max_growth = 0.003      # +0.3%
+    elif previous_year >= 0.85:
+        max_growth = 0.005      # +0.5%
+    elif previous_year >= 0.80:
+        max_growth = 0.010      # +1%
+    elif previous_year >= 0.70:
+        max_growth = 0.015      # +1.5%
+    else:
+        max_growth = 0.020      # +2%
+
+    predicted = min(predicted, previous_year + max_growth)
+
+    return round(min(predicted, 0.98), 4)
+
 
 def forecast_missing_periods(values):
     """
@@ -47,16 +84,7 @@ def forecast_missing_periods(values):
             new_value = last_value + growth + noise
 
 
-            new_value = max(
-                0,
-                min(new_value, 1)
-            )
-
-
-            new_value = round(
-                new_value,
-                4
-            )
+            new_value = limit_growth(last_value, new_value)
 
 
             result[i] = new_value
@@ -140,16 +168,7 @@ def forecast_missing_periods_osa(values):
             new_value = previous + change + noise
 
 
-            new_value = max(
-                0,
-                min(new_value, 0.98)
-            )
-
-
-            new_value = round(
-                new_value,
-                4
-            )
+            new_value = limit_growth(previous, new_value)
 
 
             result[i] = new_value
@@ -220,16 +239,8 @@ def forecast_next_year(values):
         )
 
 
-        new_value = value * (
-            1 + growth
-        ) + noise
-
-
-
-        new_value = max(
-            0,
-            min(new_value,1)
-        )
+        new_value = value * (1 + growth) + noise
+        new_value = limit_growth(value, new_value)
 
 
         result.append(
@@ -309,16 +320,7 @@ def forecast_next_year_osa(values):
 
 
 
-        new_value = max(
-            0,
-            min(new_value,0.98)
-        )
-
-
-        new_value = round(
-            new_value,
-            4
-        )
+        new_value = limit_growth(value, new_value)
 
 
         result.append(new_value)
