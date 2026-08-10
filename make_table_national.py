@@ -483,13 +483,11 @@ def create_table(wb, df, dmr_dict):
 
                 else: merch_values.append(None)
 
-            values = [v for v in dmr_values.values() if isinstance(v, (int, float))]
-            if values:
-                ws.cell(
-                    row=current_row + 1,
-                    column=START_COL + 15,
-                    value=sum(values)
-                ).number_format = "# ##0"
+            ws.cell(
+                row=current_row + 1,
+                column=START_COL + 15,
+                value=f"=SUM({get_column_letter(START_COL + 2)}{current_row + 1}:{get_column_letter(START_COL + 14)}{current_row + 1})"
+            ).number_format = "# ##0"
 
         # ==================================================
         # Заполняем отсутствующие периоды текущего года
@@ -633,10 +631,7 @@ def create_table(wb, df, dmr_dict):
                 ws.cell(
                     row=current_row + 5,
                     column=col,
-                    value=round(
-                        forecast_merch - current_merch,
-                        4
-                    )
+                    value=f"={get_column_letter(col)}{current_row + 4}-{get_column_letter(col)}{current_row + 3}"
                 ).number_format = "0.00%"
 
 
@@ -671,10 +666,7 @@ def create_table(wb, df, dmr_dict):
                 ws.cell(
                     row=current_row + 10,
                     column=col,
-                    value=round(
-                        forecast_osa - current_osa,
-                        4
-                    )
+                    value=f"={get_column_letter(col)}{current_row + 9}-{get_column_letter(col)}{current_row + 8}"
                 ).number_format = "0.00%"
 
         # ==================================================
@@ -701,10 +693,7 @@ def create_table(wb, df, dmr_dict):
                 ws.cell(
                     row=current_row + 6,
                     column=col,
-                    value=round(
-                        dif / 0.03 * 0.01,
-                        4
-                    )
+                    value=f"={get_column_letter(col)}{current_row + 5}/0.03*0.01"
                 ).number_format = "0.00%"
 
         # ==================================================
@@ -730,7 +719,7 @@ def create_table(wb, df, dmr_dict):
                 ws.cell(
                     row=current_row + 7,
                     column=col,
-                    value=round(dmr * lsv, 2)
+                    value=f"={get_column_letter(col)}{current_row + 1}*{get_column_letter(col)}{current_row + 6}"
                 ).number_format = '# ##0.00'
 
 
@@ -760,10 +749,7 @@ def create_table(wb, df, dmr_dict):
                 ws.cell(
                     row=current_row + 11,
                     column=col,
-                    value=round(
-                        dif / 0.03 * 0.01,
-                        4
-                    )
+                    value=f"={get_column_letter(col)}{current_row + 10}/0.03*0.01"
                 ).number_format = "0.00%"
 
         # ==================================================
@@ -789,7 +775,7 @@ def create_table(wb, df, dmr_dict):
                 ws.cell(
                     row=current_row + 12,
                     column=col,
-                    value=round(dmr * lsv, 2)
+                    value=f"={get_column_letter(col)}{current_row + 1}*{get_column_letter(col)}{current_row + 11}"
                 ).number_format = '# ##0.00'
 
         # ==================================================
@@ -824,17 +810,11 @@ def create_table(wb, df, dmr_dict):
 
             if merch_current is not None and osa_current is not None:
 
-                total_current = min(
-                    merch_current + osa_current,
-                    1
-                )
-
                 ws.cell(
                     row=current_row + 13,
                     column=col,
-                    value=round(total_current,4)
+                    value=f"=MIN({get_column_letter(col)}{current_row + 3}+{get_column_letter(col)}{current_row + 8},1)"
                 ).number_format = "0.00%"
-
 
 
             merch_next = ws.cell(
@@ -851,15 +831,10 @@ def create_table(wb, df, dmr_dict):
 
             if merch_next is not None and osa_next is not None:
 
-                total_next = min(
-                    merch_next + osa_next,
-                    1
-                )
-
                 ws.cell(
                     row=current_row + 14,
                     column=col,
-                    value=round(total_next,4)
+                    value=f"=MIN({get_column_letter(col)}{current_row + 4}+{get_column_letter(col)}{current_row + 9},1)"
                 ).number_format = "0.00%"
 
 
@@ -882,10 +857,7 @@ def create_table(wb, df, dmr_dict):
                 ws.cell(
                     row=current_row + 15,
                     column=col,
-                    value=round(
-                        total_next_value - total_current_value,
-                        4
-                    )
+                    value=f"={get_column_letter(col)}{current_row + 14}-{get_column_letter(col)}{current_row + 13}"
                 ).number_format = "0.00%"
             
 
@@ -955,10 +927,7 @@ def create_table(wb, df, dmr_dict):
             ws.cell(
                 row=current_row + 3,
                 column=total_col,
-                value=round(
-                    sum(merch_current_values) / len(merch_current_values),
-                    4
-                )
+                value=f"=AVERAGE({get_column_letter(START_COL + 2)}{current_row + 3}:{get_column_letter(START_COL + 14)}{current_row + 3})"
             ).number_format = "0.00%"
 
 
@@ -985,10 +954,7 @@ def create_table(wb, df, dmr_dict):
             ws.cell(
                 row=current_row + 4,
                 column=total_col,
-                value=round(
-                    sum(merch_next_values) / len(merch_next_values),
-                    4
-                )
+                value=f"=AVERAGE({get_column_letter(START_COL + 2)}{current_row + 4}:{get_column_letter(START_COL + 14)}{current_row + 4})"
             ).number_format = "0.00%"
 
 
@@ -1014,10 +980,7 @@ def create_table(wb, df, dmr_dict):
             ws.cell(
                 row=current_row + 5,
                 column=total_col,
-                value=round(
-                    merch_next_total - merch_current_total,
-                    4
-                )
+                value=f"={get_column_letter(total_col)}{current_row + 4}-{get_column_letter(total_col)}{current_row + 3}"
             ).number_format = "0.00%"
 
 
@@ -1037,10 +1000,7 @@ def create_table(wb, df, dmr_dict):
             ws.cell(
                 row=current_row + 6,
                 column=total_col,
-                value=round(
-                    dif_merch_total / 0.03 * 0.01,
-                    4
-                )
+                value=f"={get_column_letter(total_col)}{current_row + 5}/0.03*0.01"
             ).number_format = "0.00%"
 
 
@@ -1071,10 +1031,7 @@ def create_table(wb, df, dmr_dict):
             ws.cell(
                 row=current_row + 8,
                 column=total_col,
-                value=round(
-                    sum(osa_current_values) / len(osa_current_values),
-                    4
-                )
+                value=f"=AVERAGE({get_column_letter(START_COL + 2)}{current_row + 8}:{get_column_letter(START_COL + 14)}{current_row + 8})"
             ).number_format = "0.00%"
 
 
@@ -1099,10 +1056,7 @@ def create_table(wb, df, dmr_dict):
             ws.cell(
                 row=current_row + 9,
                 column=total_col,
-                value=round(
-                    sum(osa_next_values) / len(osa_next_values),
-                    4
-                )
+                value=f"=AVERAGE({get_column_letter(START_COL + 2)}{current_row + 9}:{get_column_letter(START_COL + 14)}{current_row + 9})"
             ).number_format = "0.00%"
 
 
@@ -1127,10 +1081,7 @@ def create_table(wb, df, dmr_dict):
             ws.cell(
                 row=current_row + 10,
                 column=total_col,
-                value=round(
-                    osa_next_total - osa_current_total,
-                    4
-                )
+                value=f"={get_column_letter(total_col)}{current_row + 9}-{get_column_letter(total_col)}{current_row + 8}"
             ).number_format = "0.00%"
 
 
@@ -1147,11 +1098,8 @@ def create_table(wb, df, dmr_dict):
 
             ws.cell(
                 row=current_row + 11,
-            column=total_col,
-                value=round(
-                    dif_osa_total / 0.03 * 0.01,
-                    4
-                )
+                column=total_col,
+                value=f"={get_column_letter(total_col)}{current_row + 10}/0.03*0.01"
             ).number_format = "0.00%"
 
 
@@ -1192,11 +1140,7 @@ def create_table(wb, df, dmr_dict):
             ws.cell(
                 row=current_row + 13,
                 column=total_col,
-                value=round(
-                    sum(total_osa_current_values) /
-                    len(total_osa_current_values),
-                    4
-                )
+                value=f"=AVERAGE({get_column_letter(START_COL + 2)}{current_row + 13}:{get_column_letter(START_COL + 14)}{current_row + 13})"
             ).number_format = "0.00%"
 
 
@@ -1206,11 +1150,7 @@ def create_table(wb, df, dmr_dict):
             ws.cell(
                 row=current_row + 14,
                 column=total_col,
-                value=round(
-                    sum(total_osa_next_values) /
-                    len(total_osa_next_values),
-                    4
-                )
+                value=f"=AVERAGE({get_column_letter(START_COL + 2)}{current_row + 14}:{get_column_letter(START_COL + 14)}{current_row + 14})"
             ).number_format = "0.00%"
 
 
@@ -1234,10 +1174,7 @@ def create_table(wb, df, dmr_dict):
             ws.cell(
                 row=current_row + 15,
                 column=total_col,
-                value=round(
-                    total_next - total_current,
-                    4
-                )
+                value=f"={get_column_letter(total_col)}{current_row + 14}-{get_column_letter(total_col)}{current_row + 13}"
             ).number_format = "0.00%"
 
         # ==================================================
@@ -1263,10 +1200,7 @@ def create_table(wb, df, dmr_dict):
                 ws.cell(
                     row=current_row + 16,
                     column=col,
-                    value=round(
-                        merch_effect + osa_effect,
-                        2
-                    )
+                    value=f"={get_column_letter(col)}{current_row + 7}+{get_column_letter(col)}{current_row + 12}"
                 ).number_format = "# ##0.00"
 
         # Эф-т, млн руб Merch in (total)
@@ -1276,29 +1210,11 @@ def create_table(wb, df, dmr_dict):
         # сумма всех периодов
         # ==================================================
 
-        merch_effect_total = []
-
-        for i in range(13):
-
-            value = ws.cell(
-                row=current_row + 7,
-                column=START_COL + 2 + i
-            ).value
-
-            if value is not None:
-                merch_effect_total.append(value)
-
-
-        if merch_effect_total:
-
-            ws.cell(
-                row=current_row + 7,
-                column=total_col,
-                value=round(
-                    sum(merch_effect_total),
-                    2
-                )
-            ).number_format = "# ##0.00"
+        ws.cell(
+            row=current_row + 7,
+            column=total_col,
+            value=f"=SUM({get_column_letter(START_COL + 2)}{current_row + 7}:{get_column_letter(START_COL + 14)}{current_row + 7})"
+        ).number_format = "# ##0.00"
 
 
 
@@ -1307,29 +1223,11 @@ def create_table(wb, df, dmr_dict):
         # сумма всех периодов
         # ==================================================
 
-        osa_effect_total = []
-
-        for i in range(13):
-
-            value = ws.cell(
-                row=current_row + 12,
-                column=START_COL + 2 + i
-            ).value
-
-            if value is not None:
-                osa_effect_total.append(value)
-
-
-        if osa_effect_total:
-
-            ws.cell(
-                row=current_row + 12,
-                column=total_col,
-                value=round(
-                    sum(osa_effect_total),
-                    2
-                )
-            ).number_format = "# ##0.00"
+        ws.cell(
+            row=current_row + 12,
+            column=total_col,
+            value=f"=SUM({get_column_letter(START_COL + 2)}{current_row + 12}:{get_column_letter(START_COL + 14)}{current_row + 12})"
+        ).number_format = "# ##0.00"
 
 
 
@@ -1355,10 +1253,7 @@ def create_table(wb, df, dmr_dict):
             ws.cell(
                 row=current_row + 16,
                 column=total_col,
-                value=round(
-                    merch_total + osa_total,
-                    2
-                )
+                value=f"={get_column_letter(total_col)}{current_row + 7}+{get_column_letter(total_col)}{current_row + 12}"
             ).number_format = "# ##0.00"
 
 # ==================================================
