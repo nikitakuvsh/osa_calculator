@@ -1,8 +1,9 @@
 from tkinter import Tk, filedialog
 from openpyxl import Workbook
 import questionary
+from pathlib import Path
 
-import make_table_national, make_table_regional
+import make_table_national as make_table_national, make_table_regional as make_table_regional
 from merge_data import merge_data
 
 
@@ -68,7 +69,9 @@ def main():
         if choose_type == 'national': make_table_national.create_table(wb, export_df, dmr_dict)
         else: make_table_regional.create_table(wb, export_df, dmr_dict)
         wb._sheets = [wb["Report"], wb["Export"]]
-        wb.save("result.xlsx")
+        project_root = Path(__file__).resolve().parent.parent
+        output_file = project_root / "results.xlsx"
+        wb.save(output_file)
         print(GREEN + "\n[SUCCESS] OSA Calculator завершил работу!" "\n[SUCCESS] Файл result.xlsx создан." + RESET)
 
 

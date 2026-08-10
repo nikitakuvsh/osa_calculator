@@ -51,7 +51,7 @@ echo       Starting calculator
 echo ================================
 echo.
 
-
+cd src
 python main.py
 
 
