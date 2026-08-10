@@ -175,11 +175,11 @@ def create_table(wb, df, dmr_dict):
             get_column_letter(
                 START_COL + 2 + i
             )
-        ].width = 12
+        ].width = 17
 
     ws.column_dimensions[
         get_column_letter(TOTAL_COL)
-    ].width = 14
+    ].width = 17
 
     # ==========================================================
     # Стили
@@ -455,6 +455,9 @@ def create_table(wb, df, dmr_dict):
             cell.font = bold
             cell.number_format = "# ##0.00"
             cell.alignment = center
+
+        for col in range(1, 150):
+            ws.cell(row=region_row, column=col).fill = dark_green
 
         # ------------------------------------------------------
         # TOTAL региона
@@ -840,7 +843,6 @@ def create_table(wb, df, dmr_dict):
                 )
 
                 dif_cell.number_format = "0.00%"
-                dif_cell.font = red_text
                 dif_cell.border = border
                 dif_cell.alignment = center
 
@@ -859,7 +861,6 @@ def create_table(wb, df, dmr_dict):
                 )
 
                 lsv_cell.number_format = "0.00%"
-                lsv_cell.font = red_text
                 lsv_cell.border = border
                 lsv_cell.alignment = center
 
@@ -989,7 +990,6 @@ def create_table(wb, df, dmr_dict):
             )
 
             dif_total.number_format = "0.00%"
-            dif_total.font = red_text
             dif_total.border = border
             dif_total.alignment = center
 
@@ -1008,7 +1008,6 @@ def create_table(wb, df, dmr_dict):
             )
 
             lsv_total.number_format = "0.00%"
-            lsv_total.font = red_text
             lsv_total.border = border
             lsv_total.alignment = center
 
@@ -1108,8 +1107,6 @@ def create_table(wb, df, dmr_dict):
                         column=col
                     )
 
-                    if cell.value is not None:
-                        cell.font = red_text
 
             # ==================================================
             # Следующая компания

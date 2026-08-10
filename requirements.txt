@@ -4,8 +4,11 @@ mdurl==0.1.2
 numpy==2.5.1
 openpyxl==3.1.5
 pandas==3.0.5
+prompt_toolkit==3.0.53
 Pygments==2.20.0
 python-dateutil==2.9.0.post0
+questionary==2.1.1
 rich==15.0.0
 six==1.17.0
 tzdata==2026.3
+wcwidth==0.8.2
