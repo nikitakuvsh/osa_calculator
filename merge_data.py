@@ -47,8 +47,8 @@ def find_export_header(source_file):
     required = {
         "full_period_name",
         "OSA After",
-        "OSA Before",
-        "Merch Impact",
+        # "OSA Before",
+        # "Merch Impact",
         "retailer_name"
     }
 
